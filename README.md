@@ -1,0 +1,1 @@
+# datafabrikken-ingress-config
