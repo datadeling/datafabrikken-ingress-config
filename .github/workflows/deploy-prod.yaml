@@ -25,7 +25,7 @@ jobs:
         run: |
           helm repo add datafabrikken-ingress https://datadeling.github.io/helm-chart/
           helm fetch --untar --untardir ./helm datafabrikken-ingress/ingress
-          helm template -f ${{ steps.write_file.outputs.filePath }} ./helm/ingress/ > ./kubectlapply.yaml
+          helm template -f ${{ steps.write_file.outputs.filePath }} ./helm/ingress/ > ./kubectlapply.yaml --debug
           chmod o+w ./kubectlapply.yaml
           cat kubectlapply.yaml
 
