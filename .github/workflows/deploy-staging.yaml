@@ -1,10 +1,10 @@
 name: Deploy to production (ipv4 & ipv6)
 
 on:
-  push:
+  pull_request:
+    types: [ready_for_review, opened, reopened, synchronize]
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   deploy-production-ipv4:
@@ -19,7 +19,7 @@ jobs:
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'secret.yaml'
-          encodedString: ${{ secrets.DATAFABRIKKEN_INGRESS_PROD_IPV4 }}
+          encodedString: ${{ secrets.DATAFABRIKKEN_INGRESS_DEV_IPV4 }}
 
       - name: Apply Helm template
         run: |
@@ -33,13 +33,14 @@ jobs:
       - name: Setup gcloud CLI for deploy
         uses: google-github-actions/setup-gcloud@master
         with:
-          service_account_key: ${{ secrets.DATAFABRIKKEN_PROD_AUTODEPLOY }}
+          service_account_key: ${{ secrets.DATAFABRIKKEN_DEV_AUTODEPLOY }}
           export_default_credentials: true
 
       - name: Deploy to GCP
         run: |
-          gcloud container clusters get-credentials datafabrikken-prod --region europe-north1-a --project datafabrikken-prod
+          gcloud container clusters get-credentials datafabrikken-dev --region europe-north1-a --project datafabrikken-dev
           kubectl apply -f ./kubectlapply.yaml --force
+
 
   # Consider moving to separate slack-channel
   #      - name: Notify slack
@@ -48,7 +49,7 @@ jobs:
   #          mention: 'channel'
   #          if_mention: failure
   #          status: ${{ job.status }}
-  #          author_name: 'Application: ingress(ipv4) | Environment: prod'
+  #          author_name: 'Application: ingress(ipv4) | Environment: staging'
   #          fields: commit,author,workflow,message
   #        env:
   #          GITHUB_TOKEN: ${{ github.token }}
@@ -67,7 +68,7 @@ jobs:
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'secret.yaml'
-          encodedString: ${{ secrets.DATAFABRIKKEN_INGRESS_PROD_IPV6 }}
+          encodedString: ${{ secrets.DATAFABRIKKEN_INGRESS_DEV_IPV6 }}
 
       - name: Apply Helm template
         run: |
@@ -81,12 +82,12 @@ jobs:
       - name: Setup gcloud CLI for deploy
         uses: google-github-actions/setup-gcloud@master
         with:
-          service_account_key: ${{ secrets.DATAFABRIKKEN_PROD_AUTODEPLOY }}
+          service_account_key: ${{ secrets.DATAFABRIKKEN_DEV_AUTODEPLOY }}
           export_default_credentials: true
 
       - name: Deploy to GCP
         run: |
-          gcloud container clusters get-credentials datafabrikken-prod --region europe-north1-a --project datafabrikken-prod
+          gcloud container clusters get-credentials datafabrikken-dev --region europe-north1-a --project datafabrikken-dev
           kubectl apply -f ./kubectlapply.yaml --force
 
 # Consider moving to separate slack channel
@@ -96,7 +97,7 @@ jobs:
 #          mention: 'channel'
 #          if_mention: failure
 #          status: ${{ job.status }}
-#          author_name: 'Application: ingress(ipv6) | Environment: prod'
+#          author_name: 'Application: ingress(ipv6) | Environment: staging'
 #          fields: commit,author,workflow,message
 #        env:
 #          GITHUB_TOKEN: ${{ github.token }}
