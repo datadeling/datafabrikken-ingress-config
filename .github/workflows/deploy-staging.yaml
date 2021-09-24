@@ -5,6 +5,7 @@ on:
     types: [ready_for_review, opened, reopened, synchronize]
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy-production-ipv4:
@@ -24,9 +25,9 @@ jobs:
       - name: Apply Helm template
         run: |
           helm repo add datafabrikken-ingress https://datadeling.github.io/helm-chart/
-          helm fetch --untar --untardir ./helm datafabrikken-ingress/ingress
+          helm fetch --untar --untardir ./helm staging-datafabrikken-ingress/staging-ingress
           helm template -f ${{ steps.write_file.outputs.filePath }} \
-          ./helm/ingress/ > ./kubectlapply.yaml
+          ./helm/staging-ingress/ > ./kubectlapply.yaml
           chmod o+w ./kubectlapply.yaml
           cat kubectlapply.yaml
 
@@ -42,64 +43,65 @@ jobs:
           kubectl apply -f ./kubectlapply.yaml --force
 
 
-  # Consider moving to separate slack-channel
-  #      - name: Notify slack
-  #        uses: 8398a7/action-slack@v3
-  #        with:
-  #          mention: 'channel'
-  #          if_mention: failure
-  #          status: ${{ job.status }}
-  #          author_name: 'Application: ingress(ipv4) | Environment: staging'
-  #          fields: commit,author,workflow,message
-  #        env:
-  #          GITHUB_TOKEN: ${{ github.token }}
-  #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  #        if: always()
-
-  deploy-production-ipv6:
-    name: Deploy ingress(ipv6) to prod environment on merge to master branch
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Create yaml file from secret
-        id: write_file
-        uses: timheuer/base64-to-file@v1
-        with:
-          fileName: 'secret.yaml'
-          encodedString: ${{ secrets.DATAFABRIKKEN_INGRESS_DEV_IPV6 }}
-
-      - name: Apply Helm template
-        run: |
-          helm repo add datafabrikken-ingress https://datadeling.github.io/helm-chart/
-          helm fetch --untar --untardir ./helm datafabrikken-ingress/ingress
-          helm template -f ${{ steps.write_file.outputs.filePath }} \
-          ./helm/ingress/ > ./kubectlapply.yaml
-          chmod o+w ./kubectlapply.yaml
-          cat kubectlapply.yaml
-
-      - name: Setup gcloud CLI for deploy
-        uses: google-github-actions/setup-gcloud@master
-        with:
-          service_account_key: ${{ secrets.DATAFABRIKKEN_DEV_AUTODEPLOY }}
-          export_default_credentials: true
-
-      - name: Deploy to GCP
-        run: |
-          gcloud container clusters get-credentials datafabrikken-dev --region europe-north1-a --project datafabrikken-dev
-          kubectl apply -f ./kubectlapply.yaml --force
-
-# Consider moving to separate slack channel
+# Consider moving to separate slack-channel
 #      - name: Notify slack
 #        uses: 8398a7/action-slack@v3
 #        with:
 #          mention: 'channel'
 #          if_mention: failure
 #          status: ${{ job.status }}
-#          author_name: 'Application: ingress(ipv6) | Environment: staging'
+#          author_name: 'Application: ingress(ipv4) | Environment: staging'
 #          fields: commit,author,workflow,message
 #        env:
 #          GITHUB_TOKEN: ${{ github.token }}
 #          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #        if: always()
+
+# IPV6 not necessary at this time
+#  deploy-production-ipv6:
+#    name: Deploy ingress(ipv6) to prod environment on merge to master branch
+#    runs-on: ubuntu-latest
+#
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Create yaml file from secret
+#        id: write_file
+#        uses: timheuer/base64-to-file@v1
+#        with:
+#          fileName: 'secret.yaml'
+#          encodedString: ${{ secrets.DATAFABRIKKEN_INGRESS_DEV_IPV6 }}
+#
+#      - name: Apply Helm template
+#        run: |
+#          helm repo add datafabrikken-ingress https://datadeling.github.io/helm-chart/
+#          helm fetch --untar --untardir ./helm datafabrikken-ingress/ingress
+#          helm template -f ${{ steps.write_file.outputs.filePath }} \
+#          ./helm/ingress/ > ./kubectlapply.yaml
+#          chmod o+w ./kubectlapply.yaml
+#          cat kubectlapply.yaml
+#
+#      - name: Setup gcloud CLI for deploy
+#        uses: google-github-actions/setup-gcloud@master
+#        with:
+#          service_account_key: ${{ secrets.DATAFABRIKKEN_DEV_AUTODEPLOY }}
+#          export_default_credentials: true
+#
+#      - name: Deploy to GCP
+#        run: |
+#          gcloud container clusters get-credentials datafabrikken-dev --region europe-north1-a --project datafabrikken-dev
+#          kubectl apply -f ./kubectlapply.yaml --force
+#
+## Consider moving to separate slack channel
+##      - name: Notify slack
+##        uses: 8398a7/action-slack@v3
+##        with:
+##          mention: 'channel'
+##          if_mention: failure
+##          status: ${{ job.status }}
+##          author_name: 'Application: ingress(ipv6) | Environment: staging'
+##          fields: commit,author,workflow,message
+##        env:
+##          GITHUB_TOKEN: ${{ github.token }}
+##          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+##        if: always()
