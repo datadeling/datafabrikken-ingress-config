@@ -24,8 +24,8 @@ jobs:
 
       - name: Apply Helm template
         run: |
-          helm repo add datafabrikken-ingress https://datadeling.github.io/helm-chart/
-          helm fetch --untar --untardir ./helm staging-datafabrikken-ingress-config/staging-ingress
+          helm repo add staging-datafabrikken-ingress https://datadeling.github.io/helm-chart/
+          helm fetch --untar --untardir ./helm staging-datafabrikken-ingress/staging-ingress
           helm template -f ${{ steps.write_file.outputs.filePath }} \
           ./helm/staging-ingress/ > ./kubectlapply.yaml
           chmod o+w ./kubectlapply.yaml
