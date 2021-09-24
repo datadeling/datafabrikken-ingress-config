@@ -1,4 +1,4 @@
-name: Deploy to production (ipv4 & ipv6)
+name: Deploy to staging (ipv4)
 
 on:
   pull_request:
@@ -20,7 +20,7 @@ jobs:
         uses: timheuer/base64-to-file@v1
         with:
           fileName: 'secret.yaml'
-          encodedString: ${{ secrets.DATAFABRIKKEN_INGRESS_DEV_IPV4 }}
+          encodedString: ${{ secrets.DATAFABRIKKEN_INGRESS_STAGING_IPV4 }}
 
       - name: Apply Helm template
         run: |
