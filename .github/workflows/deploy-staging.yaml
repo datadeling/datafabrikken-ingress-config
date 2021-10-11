@@ -42,20 +42,18 @@ jobs:
           gcloud container clusters get-credentials datafabrikken-dev --region europe-north1-a --project datafabrikken-dev
           kubectl apply -f ./kubectlapply.yaml --force
 
-
-# Consider moving to separate slack-channel
-#      - name: Notify slack
-#        uses: 8398a7/action-slack@v3
-#        with:
-#          mention: 'channel'
-#          if_mention: failure
-#          status: ${{ job.status }}
-#          author_name: 'Application: ingress(ipv4) | Environment: staging'
-#          fields: commit,author,workflow,message
-#        env:
-#          GITHUB_TOKEN: ${{ github.token }}
-#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-#        if: always()
+      - name: Notify slack
+        uses: 8398a7/action-slack@v3
+        with:
+          mention: 'channel'
+          if_mention: failure
+          status: ${{ job.status }}
+          author_name: 'Application: datafabrikken-ingress(ipv4) | Environment: staging'
+          fields: commit,author,workflow,message
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
 
 # IPV6 not necessary at this time
 #  deploy-production-ipv6:
