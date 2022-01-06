@@ -13,7 +13,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Create yaml file from secret
         id: write_file
@@ -24,18 +25,15 @@ jobs:
 
       - name: Apply Helm template
         run: |
-          helm repo add staging-datafabrikken-ingress https://datadeling.github.io/helm-chart/
-          helm fetch --untar --untardir ./helm staging-datafabrikken-ingress/staging-ingress
           helm template -f ${{ steps.write_file.outputs.filePath }} \
-          ./helm/staging-ingress/ > ./kubectlapply.yaml
+          ./helm-sources-staging/ > ./kubectlapply.yaml
           chmod o+w ./kubectlapply.yaml
           cat kubectlapply.yaml
 
-      - name: Setup gcloud CLI for deploy
-        uses: google-github-actions/setup-gcloud@master
+      - name: Auth gcloud CLI for deploy
+        uses: google-github-actions/auth@v0
         with:
-          service_account_key: ${{ secrets.DATAFABRIKKEN_DEV_AUTODEPLOY }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.DATAFABRIKKEN_DEV_AUTODEPLOY }}
 
       - name: Deploy to GCP
         run: |

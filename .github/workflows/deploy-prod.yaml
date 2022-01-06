@@ -23,18 +23,15 @@ jobs:
 
       - name: Apply Helm template
         run: |
-          helm repo add datafabrikken-ingress https://datadeling.github.io/helm-chart/
-          helm fetch --untar --untardir ./helm datafabrikken-ingress/ingress
           helm template -f ${{ steps.write_file.outputs.filePath }} \
-          ./helm/ingress/ > ./kubectlapply.yaml
+          ./helm-sources/ > ./kubectlapply.yaml
           chmod o+w ./kubectlapply.yaml
           cat kubectlapply.yaml
 
-      - name: Setup gcloud CLI for deploy
-        uses: google-github-actions/setup-gcloud@master
+      - name: Auth gcloud CLI for deploy
+        uses: google-github-actions/auth@v0
         with:
-          service_account_key: ${{ secrets.DATAFABRIKKEN_PROD_AUTODEPLOY }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.DATAFABRIKKEN_PROD_AUTODEPLOY }}
 
       - name: Deploy to GCP
         run: |
@@ -59,7 +56,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - name: Create yaml file from secret
         id: write_file
@@ -70,18 +68,15 @@ jobs:
 
       - name: Apply Helm template
         run: |
-          helm repo add datafabrikken-ingress https://datadeling.github.io/helm-chart/
-          helm fetch --untar --untardir ./helm datafabrikken-ingress/ingress
           helm template -f ${{ steps.write_file.outputs.filePath }} \
-          ./helm/ingress/ > ./kubectlapply.yaml
+          ./helm-sources/ > ./kubectlapply.yaml
           chmod o+w ./kubectlapply.yaml
           cat kubectlapply.yaml
 
-      - name: Setup gcloud CLI for deploy
-        uses: google-github-actions/setup-gcloud@master
+      - name: Auth gcloud CLI for deploy
+        uses: google-github-actions/auth@v0
         with:
-          service_account_key: ${{ secrets.DATAFABRIKKEN_PROD_AUTODEPLOY }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.DATAFABRIKKEN_PROD_AUTODEPLOY }}
 
       - name: Deploy to GCP
         run: |
