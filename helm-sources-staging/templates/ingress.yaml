@@ -10,7 +10,7 @@ spec:
   rules:
   - http:
       paths:
-      - path: /veiviser-for-deling-av-data
+      - path: /juridisk-veileder-for-datadeling
         pathType: Prefix
         backend:
           service:
