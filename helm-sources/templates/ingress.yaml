@@ -20,7 +20,7 @@ spec:
           - path: /*
             pathType: ImplementationSpecific
             backend:
-              serviceName: datafabrikken-portal
+              serviceName: datafabrikken-portal-nextjs
               servicePort: 8080
     - host: {{ required "Missing value HOSTNAME_DATAFABRIKKEN_CMS" .Values.HOSTNAME_DATAFABRIKKEN_CMS }}
       http:
