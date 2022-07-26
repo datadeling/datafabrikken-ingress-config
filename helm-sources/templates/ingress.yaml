@@ -1,4 +1,4 @@
-apiVersion: networking.k8s.io/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ required "Missing value DATAFABRIKKEN_INGRESSNAME" .Values.DATAFABRIKKEN_INGRESSNAME }}
@@ -15,21 +15,20 @@ spec:
           - path: /juridisk-veileder-for-datadeling
             pathType: Prefix
             backend:
-              serviceName: datafabrikken-veiviser-dele-data
-              servicePort: 8080
+              service:
+                name: datafabrikken-veiviser-dele-data
+                port:
+                  number: 8080
           - path: /*
             pathType: ImplementationSpecific
             backend:
-              serviceName: datafabrikken-portal-nextjs
-              servicePort: 8080
+              service:
+                name: datafabrikken-portal-nextjs
+                port:
+                  number: 8080
     - host: {{ required "Missing value HOSTNAME_DATAFABRIKKEN_CMS" .Values.HOSTNAME_DATAFABRIKKEN_CMS }}
       http:
         paths:
-#          - path: /admin/*
-#            pathType: ImplementationSpecific
-#            backend:
-#              serviceName: datafabrikken-cms-service-admin
-#              servicePort: 8080
           - path: /*
             pathType: ImplementationSpecific
             backend:
