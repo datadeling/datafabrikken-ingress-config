@@ -12,7 +12,7 @@ spec:
     - host: {{ required "Missing value HOSTNAME_DATAFABRIKKEN_PORTAL" .Values.HOSTNAME_DATAFABRIKKEN_PORTAL }}
       http:
         paths:
-          - path: /juridisk-veileder-for-datadeling
+          - path: /juridisk-veiviser-for-datadeling
             pathType: Prefix
             backend:
               service:
