@@ -4,23 +4,27 @@ metadata:
   name: {{ required "Missing value DATAFABRIKKEN_INGRESSNAME" .Values.DATAFABRIKKEN_INGRESSNAME }}
   namespace: {{ required "Missing value NAMESPACE" .Values.NAMESPACE }}
   annotations:
-    kubernetes.io/ingress.class: "gce"
+    networking.gke.io/v1beta1.FrontendConfig: {{ required "Missing value DATAFABRIKKEN_FRONTEND_CONFIG" .Values.DATAFABRIKKEN_FRONTEND_CONFIG }}
+    ingress.gcp.kubernetes.io/pre-shared-cert: {{ required "Missing value DATAFABRIKKEN_ALL_CERT_NAMES" .Values.DATAFABRIKKEN_ALL_CERT_NAMES }}
     kubernetes.io/ingress.global-static-ip-name: {{ required "Missing value DATAFABRIKKEN_INGRESS_IP_NAME" .Values.DATAFABRIKKEN_INGRESS_IP_NAME }}
+    nginx.ingress.kubernetes.io/server-snippet: |-
+      add_header X-Robots-Tag "noindex, nofollow";
 spec:
   rules:
-  - http:
-      paths:
-      - path: /juridisk-veiviser-for-datadeling
-        pathType: Prefix
-        backend:
-          service:
-            name: datafabrikken-veiviser-dele-data
-            port:
-              number: 8080
-      - path: /*
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: datafabrikken-portal-nextjs
-            port:
-              number: 8080
+    - host: {{ required "Missing value HOSTNAME_DATAFABRIKKEN_PORTAL" .Values.HOSTNAME_DATAFABRIKKEN_PORTAL }}
+      http:
+        paths:
+          - path: /juridisk-veiviser-for-datadeling
+            pathType: Prefix
+            backend:
+              service:
+                name: datafabrikken-veiviser-dele-data
+                port:
+                  number: 8080
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: datafabrikken-portal-nextjs
+                port:
+                  number: 8080
