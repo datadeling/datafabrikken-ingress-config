@@ -28,3 +28,13 @@ spec:
                 name: datafabrikken-portal-nextjs
                 port:
                   number: 8080
+    - host: {{ required "Missing value HOSTNAME_DATAFABRIKKEN_CMS" .Values.HOSTNAME_DATAFABRIKKEN_CMS }}
+      http:
+        paths:
+          - path: /*
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: datafabrikken-cms-service
+                port:
+                  number: 8080              
